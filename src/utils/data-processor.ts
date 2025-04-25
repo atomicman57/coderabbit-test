@@ -71,6 +71,63 @@ export class DataProcessor {
     };
   }
 
+  // Function with high cyclomatic complexity - will be flagged
+  complexProcessing(
+    input: number,
+    type: string,
+    options: { flag1: boolean; flag2: boolean; threshold?: number }
+  ) {
+    let result = 0;
+    const threshold = options.threshold ?? 100;
+
+    if (type === "A") {
+      if (input > threshold && options.flag1) {
+        result = input * 2;
+        if (options.flag2) {
+          result += 50;
+        } else {
+          result -= 10;
+        }
+      } else if (input <= threshold && !options.flag1) {
+        result = input / 2;
+        if (!options.flag2) {
+          result -= 5;
+        } else {
+          result += 10;
+        }
+      } else {
+        result = input;
+      }
+    } else if (type === "B") {
+      if (options.flag1 && options.flag2) {
+        result = input + threshold;
+      } else if (options.flag1) {
+        result = input + threshold / 2;
+      } else if (options.flag2) {
+        result = input - threshold / 2;
+      } else {
+        result = input - threshold;
+      }
+    } else {
+      if (input % 2 === 0) {
+        result = input * input;
+        if (options.flag1 !== options.flag2) {
+          result = Math.sqrt(result);
+        }
+      } else {
+        result = input + 1;
+      }
+    }
+
+    if (result < 0) {
+      return 0;
+    } else if (result > 1000) {
+      return 1000;
+    }
+
+    return result;
+  }
+
   // Function with memory leak potential - will be flagged
   cacheData() {
     const cache = {};
